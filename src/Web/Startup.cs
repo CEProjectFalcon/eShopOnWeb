@@ -26,27 +26,35 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Microsoft.eShopWeb.Web
 {
     public class Startup
     {
         private IServiceCollection _services;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
-            // use in-memory database
-            ConfigureInMemoryDatabases(services);
-
-            // use real database
-            //ConfigureProductionServices(services);
+            if (_env.EnvironmentName == "Development")
+            {
+                // use in-memory database
+                ConfigureInMemoryDatabases(services);
+            }
+            else
+            {
+                // use real database
+                ConfigureProductionServices(services);
+            }
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
@@ -205,6 +213,11 @@ namespace Microsoft.eShopWeb.Web
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            
             app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();
