@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Criar imagem da aplicações
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master, capitulo6 ]
+  pull_request:
+    branches: [ master, capitulo6 ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Pegar versão da tag
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+
+      - name: Azure Container Registry Login, Build and Push
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push - Frontend
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: ./src/Web/Dockerfile
+          tags: |
+            ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:{{ steps.vars.outputs.tag }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
+
+      - name: Build and push - PublicAPI
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: ./src/PublicApi/Dockerfile
+          tags: |
+            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:{{ steps.vars.outputs.tag }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
