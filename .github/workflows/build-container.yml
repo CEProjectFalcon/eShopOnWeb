@@ -27,6 +27,10 @@ jobs:
         id: vars
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
 
+      - name: DEBUG:Tag
+        run: echo {{ steps.vars.outputs.tag }}
+        
+        
       - name: Azure Container Registry Login, Build and Push
         uses: azure/docker-login@v1
         with:
