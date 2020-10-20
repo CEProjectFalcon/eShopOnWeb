@@ -31,12 +31,15 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and push - Frontend
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1
         with:
           push: true
           context: .
           file: ./src/Web/Dockerfile
-          tags: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
+          repository: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend
+          tags: latest
+          tag_with_ref: true
+
 
       - name: Build and push - PublicAPI
         uses: docker/build-push-action@v2
@@ -44,4 +47,6 @@ jobs:
           push: true
           context: .
           file: ./src/PublicApi/Dockerfile
-          tags: ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
+          repository: ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi
+          tags: latest
+          tag_with_ref: true
