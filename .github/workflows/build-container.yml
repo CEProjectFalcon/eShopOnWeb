@@ -25,10 +25,10 @@ jobs:
 
       - name: Pegar versão da tag
         id: vars
-        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+        run: echo ::set-env name=tag::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
 
       - name: DEBUG:Tag
-        run: echo {{ steps.vars.outputs.tag }}
+        run: $(echo {{ steps.vars.outputs.tag }})
         
         
       - name: Azure Container Registry Login, Build and Push
