@@ -37,6 +37,7 @@ jobs:
           path: .
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+          registry: ${{ secrets.ACR_SERVER }}
           dockerfile: ./src/Web/Dockerfile
           repository: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend
           tags: latest
