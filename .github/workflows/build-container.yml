@@ -34,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           push: true
-          file: src/Web/Dockerfile
+          path: ./src/Web/Dockerfile
           repository: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend
           tags: latest
           tag_with_sha: true
@@ -44,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           push: true
-          file: src/PublicApi/Dockerfile
+          path: ./src/PublicApi/Dockerfile
           repository: ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi
           tags: latest
           tag_with_sha: true
