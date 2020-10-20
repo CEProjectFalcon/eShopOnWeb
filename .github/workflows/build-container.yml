@@ -23,14 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Pegar versão da tag
-        id: vars
-        run: echo ::set-env name=tag::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
-
-      - name: DEBUG:Tag
-        run: $(echo {{ steps.vars.outputs.tag }})
-        
-        
       - name: Azure Container Registry Login, Build and Push
         uses: azure/docker-login@v1
         with:
@@ -44,9 +36,7 @@ jobs:
           push: true
           context: .
           file: ./src/Web/Dockerfile
-          tags: |
-            ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:{{ steps.vars.outputs.tag }}
-            ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
+          tags: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
 
       - name: Build and push - PublicAPI
         uses: docker/build-push-action@v2
@@ -54,6 +44,4 @@ jobs:
           push: true
           context: .
           file: ./src/PublicApi/Dockerfile
-          tags: |
-            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:{{ steps.vars.outputs.tag }}
-            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
+          tags: ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
