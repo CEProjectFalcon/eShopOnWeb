@@ -35,6 +35,8 @@ jobs:
         with:
           push: true
           path: .
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
           dockerfile: ./src/Web/Dockerfile
           repository: ${{ secrets.ACR_SERVER }}/eshoponweb-frontend
           tags: latest
