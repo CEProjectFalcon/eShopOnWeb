@@ -15,6 +15,11 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints
         private readonly IAsyncRepository<CatalogBrand> _catalogBrandRepository;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// List
+        /// </summary>
+        /// <param name="catalogBrandRepository"></param>
+        /// <param name="mapper"></param>
         public List(IAsyncRepository<CatalogBrand> catalogBrandRepository,
             IMapper mapper)
         {
