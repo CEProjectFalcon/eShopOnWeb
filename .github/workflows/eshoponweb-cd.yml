@@ -32,7 +32,7 @@ jobs:
       run: dotnet publish src/PublicApi/PublicApi.csproj --configuration Release --output ApiPublish --no-restore
     
     - name: Publish Web
-      run: dotnet build src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
+      run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
     
     - name: Tar API
       run: tar -czvf api.tar.gz -C ApiPublish .
