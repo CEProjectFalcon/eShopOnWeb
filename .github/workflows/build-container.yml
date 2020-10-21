@@ -22,7 +22,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
-
+      
+      - name: Set outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        
+      - name: Check outputs
+        run: echo ${{ steps.vars.outputs.sha_short }}
+        
       - name: Azure Container Registry Login, Build and Push
         uses: azure/docker-login@v1
         with:
@@ -32,13 +39,13 @@ jobs:
 
       - name: Build and push - Frontend
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }} -f ./src/Web/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ steps.vars.outputs.sha_short }} -f ./src/Web/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ steps.vars.outputs.sha_short }}
 
 
       - name: Build and push - PublicAPI
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }} -f ./src/Web/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ steps.vars.outputs.sha_short }} -f ./src/Web/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ steps.vars.outputs.sha_short }}
