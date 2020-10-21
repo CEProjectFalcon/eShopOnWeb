@@ -32,13 +32,13 @@ jobs:
 
       - name: Build and push - Frontend
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha }} -f ./src/Web/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }} -f ./src/Web/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }}
 
 
       - name: Build and push - PublicAPI
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha }} -f ./src/Web/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }} -f ./src/Web/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-frontend:${{ github.sha:7 }}
