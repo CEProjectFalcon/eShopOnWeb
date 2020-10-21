@@ -29,9 +29,8 @@ az network public-ip update -g rg-eshoponweb -n vmss-web-ch-001LBPublicIP --dns-
 az vmss extension set -g rg-eshoponweb -n CustomScript --publisher Microsoft.Azure.Extensions --version 2.0 --vmss-name vmss-web-ch-001 --settings .\script.config.json --protected-settings .\protected-config.json
 ## Load Balancer configuration
 az network lb list -g rg-eshoponweb --query "[?contains(name, 'vmss-web-ch-001')].name"
-az network lb rule create -g rg-eshoponweb -n lbr-web-ch-001 --lb-name vmss-web-ch-001LB --backend-pool-name vmss-web-ch-001LBBEPool --backend-port 80 --frontend-ip-name loadBalancerFrontEnd --frontend-port 80 --protocol tcp
-## Health probe
 az network lb probe create -g rg-eshoponweb -n healtchecks --lb-name vmss-web-ch-001LB --protocol http --port 80 --path /health
+az network lb rule create -g rg-eshoponweb -n lbr-web-ch-001 --lb-name vmss-web-ch-001LB --backend-pool-name vmss-web-ch-001LBBEPool --backend-port 80 --frontend-ip-name loadBalancerFrontEnd --frontend-port 80 --protocol tcp --probe-name healthchecks --load-distribution SourceIP
 ## Autoscale
 az monitor autoscale create -g rg-eshoponweb -n vmssas-web-ch-001 --resource vmss-web-ch-001 --resource-type Microsoft.Compute/virtualMachineScaleSets --min-count 2 --max-count 3 --count 2
 az monitor autoscale rule create -g rg-eshoponweb --autoscale-name vmssas-web-ch-001 --condition "Percentage CPU > 70 avg 5m" --scale out 1
