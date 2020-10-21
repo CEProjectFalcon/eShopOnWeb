@@ -16,7 +16,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// List
+        /// Método List
         /// </summary>
         /// <param name="catalogBrandRepository"></param>
         /// <param name="mapper"></param>
