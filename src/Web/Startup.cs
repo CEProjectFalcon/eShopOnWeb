@@ -109,6 +109,8 @@ namespace Microsoft.eShopWeb.Web
                     .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetSection("DataProtectionPath").Value));
             }
 
+            services.AddApplicationInsightsTelemetry();
+
             services.AddCookieSettings();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
