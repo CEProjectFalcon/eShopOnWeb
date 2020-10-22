@@ -37,7 +37,7 @@ sudo systemctl enable kestrel-web.service
 resourceGroupName="rg-eshoponweb"
 storageAccountName="stdeploych001"
 fileShareName="dataprotection"
-mntPath="/mnt/$storageAccountName/$fileShareName"
+mntPath="/mnt/$fileShareName"
 sudo mkdir -p $mntPath
 
 if [ ! -d "/etc/smbcredentials" ]; then
