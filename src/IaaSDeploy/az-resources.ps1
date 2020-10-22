@@ -10,9 +10,6 @@ az login
 # Resource Group
 az group create -l brazilsouth -n $resourcegroup
 
-# VNet
-az network vnet create -g $resourcegroup -l brazilsouth -n vnet-ch-001 --address-prefixes 10.1.0.0/16 --subnet-name snet-web-ch-001 --subnet-prefixes 10.1.0.0/24
-
 # Storage
 az storage account create -g $resourcegroup -n $storageaccountname -l brazilsouth --sku Standard_LRS --encryption-services blob
 az ad signed-in-user show --query objectId -o tsv | az role assignment create --role "Storage Blob Data Contributor" --assignee ateoi@microsoft.com --scope "/subscriptions/$azuresubscription/resourceGroups/$resourcegroup/providers/Microsoft.Storage/storageAccounts/$storageaccountname"
