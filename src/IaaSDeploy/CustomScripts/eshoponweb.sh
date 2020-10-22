@@ -54,7 +54,7 @@ fi
 
 sudo chmod 600 $smbCredentialFile
 
-smbPath="//stdeploych001.file.core.windows.net/dataprotection"
+smbPath="//$storageAccountName.file.core.windows.net/dataprotection"
 if [ -z "$(grep $smbPath\ $mntPath /etc/fstab)" ]; then
     echo "$smbPath $mntPath cifs uid=www-data,gid=www-data,dir_mode=0700,file_mode=0600,nofail,vers=3.0,credentials=$smbCredentialFile,serverino" | sudo tee -a /etc/fstab > /dev/null
 else
@@ -62,7 +62,7 @@ else
 fi
 
 productsPath="/var/www/eshoponweb/web/wwwroot/images/products"
-productsSmbPath="//stdeploych001.file.core.windows.net/products"
+productsSmbPath="//$storageAccountName.file.core.windows.net/products"
 if [ -z "$(grep $productsSmbPath\ $productsPath /etc/fstab)" ]; then
     echo "$productsSmbPath $productsPath cifs uid=www-data,gid=www-data,dir_mode=0755,file_mode=0644,nofail,vers=3.0,credentials=$smbCredentialFile,serverino" | sudo tee -a /etc/fstab > /dev/null
 else
