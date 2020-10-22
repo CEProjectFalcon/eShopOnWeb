@@ -12,6 +12,8 @@ az network nsg rule create -g rg-eshoponweb --nsg-name nsg-weballow-ch-001 -n ns
 az storage account create -g rg-eshoponweb -n stdeploych001 -l brazilsouth --sku Standard_LRS --encryption-services blob
 az ad signed-in-user show --query objectId -o tsv | az role assignment create --role "Storage Blob Data Contributor" --assignee ateoi@microsoft.com --scope "/subscriptions/fcb2616f-096b-4e78-b6ee-72db022919b0/resourceGroups/rg-eshoponweb/providers/Microsoft.Storage/storageAccounts/stdeploych001"
 az storage container create -n stcdeploych001 --account-name stdeploych001 --public-access off --auth-mode login
+az storage share create -n products --quota 10 --account-name stdeploych001
+az storage share create -n dataprotection --quota 10 --account-name stdeploych001
 az storage account keys list -g rg-eshoponweb -n stdeploych001
 
 # Azure SQL Database
@@ -26,7 +28,7 @@ az vmss create -g rg-eshoponweb -n vmss-web-ch-001 --image UbuntuLTS --upgrade-p
 az network public-ip list -g rg-eshoponweb --query "[?contains(name, 'vmss-web-ch-001')].name"
 az network public-ip update -g rg-eshoponweb -n vmss-web-ch-001LBPublicIP --dns-name eshoponwebch001
 ## Application deployment
-az vmss extension set -g rg-eshoponweb -n CustomScript --publisher Microsoft.Azure.Extensions --version 2.0 --vmss-name vmss-web-ch-001 --settings .\script.config.json --protected-settings .\protected-config.json
+az vmss extension set -g rg-eshoponweb -n CustomScript --publisher Microsoft.Azure.Extensions --version 2.0 --vmss-name vmss-web-ch-001 --settings .\script-config.json --protected-settings .\protected-config.json
 ## Load Balancer configuration
 az network lb list -g rg-eshoponweb --query "[?contains(name, 'vmss-web-ch-001')].name"
 az network lb probe create -g rg-eshoponweb -n healtchecks --lb-name vmss-web-ch-001LB --protocol http --port 80 --path /health
