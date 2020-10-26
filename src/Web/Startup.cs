@@ -43,10 +43,10 @@ namespace Microsoft.eShopWeb.Web
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             // use in-memory database
-            ConfigureInMemoryDatabases(services);
+            //ConfigureInMemoryDatabases(services);
 
             // use real database
-            //ConfigureProductionServices(services);
+            ConfigureProductionServices(services);
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
@@ -82,6 +82,11 @@ namespace Microsoft.eShopWeb.Web
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+
+            services.AddHttpClient("ordering-api", options =>
+            {
+                options.BaseAddress = new Uri(Configuration.GetValue<string>("OrderingBaseUrl"));
+            });
 
             ConfigureServices(services);
         }
