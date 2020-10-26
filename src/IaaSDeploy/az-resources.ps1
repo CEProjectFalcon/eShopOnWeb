@@ -37,7 +37,7 @@ az vmss extension set -g $resourcegroup -n CustomScript --publisher Microsoft.Az
 ## Load Balancer configuration
 $loadbalancer = az network lb list -g $resourcegroup --query "[?contains(name, '$scalesetname')].name" | ConvertFrom-Json
 az network lb probe create -g $resourcegroup -n healtchecks --lb-name $loadbalancer --protocol http --port 80 --path /health
-az network lb rule create -g $resourcegroup -n lbr-web-ch-001 --lb-name $loadbalancer --backend-pool-name vmss-web-ch-001LBBEPool --backend-port 80 --frontend-ip-name loadBalancerFrontEnd --frontend-port 80 --protocol tcp --probe-name healthchecks
+az network lb rule create -g $resourcegroup -n lbr-web-ch-001 --lb-name $loadbalancer --backend-pool-name "$($scalesetname)LBBEPool" --backend-port 80 --frontend-ip-name loadBalancerFrontEnd --frontend-port 80 --protocol tcp --probe-name healthchecks
 ## Autoscale
 az monitor autoscale create -g $resourcegroup -n $autoscalename --resource $scalesetname --resource-type Microsoft.Compute/virtualMachineScaleSets --min-count 2 --max-count 3 --count 2
 az monitor autoscale rule create -g $resourcegroup --autoscale-name $autoscalename --condition "Percentage CPU > 70 avg 5m" --scale out 1
