@@ -58,10 +58,10 @@ jobs:
         enable-AzPSSession: true
 
     - name: Upload api.tar.gz to Azure Blob Storage
-      run: az storage blob upload --account-name stdeploych001 --account-key gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g== --container-name stcdeploych001 --file api.tar.gz --name api.tar.gz
+      run: az storage blob upload --account-name ${{secrets.STORAGE_ACCOUNT_NAME}} --account-key ${{secrets.STORAGE_ACCOUNT_KEY}} --container-name stcdeploych001 --file api.tar.gz --name api.tar.gz
     
     - name: Upload web.tar.gz to Azure Blob Storage
-      run: az storage blob upload --account-name stdeploych001 --account-key gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g== --container-name stcdeploych001 --file web.tar.gz --name web.tar.gz    
+      run: az storage blob upload --account-name ${{secrets.STORAGE_ACCOUNT_NAME}} --account-key ${{secrets.STORAGE_ACCOUNT_KEY}} --container-name stcdeploych001 --file web.tar.gz --name web.tar.gz    
     
     - name: Run reimage command
       uses: azure/powershell@v1
