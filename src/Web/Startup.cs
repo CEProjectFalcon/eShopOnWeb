@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.eShopWeb.Web.Mentoring;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -110,6 +112,7 @@ namespace Microsoft.eShopWeb.Web
             }
 
             services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
 
             services.AddCookieSettings();
 
