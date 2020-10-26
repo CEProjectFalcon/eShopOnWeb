@@ -5,6 +5,7 @@ using AutoMapper;
 using BlazorShared;
 using BlazorShared.Authorization;
 using MediatR;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -94,6 +95,7 @@ namespace Microsoft.eShopWeb.PublicApi
 
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.Configure<CatalogSettings>(Configuration);
