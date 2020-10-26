@@ -2,9 +2,9 @@ name: eshoponweb-cd
 
 on:
   push:
-    branches: [ master, capitulo2 ]
+    branches: [ master, capitulo2, capitulo3-monitoracao ]
   pull_request:
-    branches: [ master, capitulo2 ]
+    branches: [ master, capitulo2, capitulo3-monitoracao ]
 
 jobs:
   build:

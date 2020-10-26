@@ -5,6 +5,7 @@ using AutoMapper;
 using BlazorShared;
 using BlazorShared.Authorization;
 using MediatR;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,7 @@ using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.eShopWeb.Infrastructure.Logging;
 using Microsoft.eShopWeb.Infrastructure.Services;
+using Microsoft.eShopWeb.PublicApi.Monitoring;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -89,6 +91,9 @@ namespace Microsoft.eShopWeb.PublicApi
             services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<AppIdentityDbContext>()
                     .AddDefaultTokenProviders();
+
+            services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.Configure<CatalogSettings>(Configuration);
@@ -170,6 +175,8 @@ namespace Microsoft.eShopWeb.PublicApi
                     }
                 });
             });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
