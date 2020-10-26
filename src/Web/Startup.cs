@@ -29,6 +29,7 @@ using BlazorShared;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.eShopWeb.Web.Mentoring;
+using Microsoft.ApplicationInsights.DependencyCollector;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -113,6 +114,7 @@ namespace Microsoft.eShopWeb.Web
 
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 
             services.AddCookieSettings();
 
