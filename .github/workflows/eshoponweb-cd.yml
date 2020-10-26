@@ -1,0 +1,71 @@
+name: eshoponweb-cd
+
+on:
+  push:
+    branches: [ master, capitulo2 ]
+  pull_request:
+    branches: [ master, capitulo2 ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    
+    - name: Install dependencies
+      run: dotnet restore
+    
+    - name: Build API
+      run: dotnet build src/PublicApi/PublicApi.csproj --configuration Release --no-restore
+    
+    - name: Build Web
+      run: dotnet build src/Web/Web.csproj --configuration Release --no-restore
+
+    - name: Publish API
+      run: dotnet publish src/PublicApi/PublicApi.csproj --configuration Release --output ApiPublish --no-restore
+    
+    - name: Publish Web
+      run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
+    
+    - name: Tar API
+      run: tar -czvf api.tar.gz -C ApiPublish .
+    
+    - name: Tar Web
+      run: tar -czvf web.tar.gz -C WebPublish .
+
+    - name: Artifact API
+      uses: actions/upload-artifact@v2
+      with:
+        name: api
+        path: api.tar.gz
+
+    - name: Artifact Web
+      uses: actions/upload-artifact@v2
+      with:
+        name: web
+        path: web.tar.gz
+
+    - name: Login Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+        enable-AzPSSession: true
+
+    - name: Upload api.tar.gz to Azure Blob Storage
+      run: az storage blob upload --account-name stdeploych001 --account-key gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g== --container-name stcdeploych001 --file api.tar.gz --name api.tar.gz
+    
+    - name: Upload web.tar.gz to Azure Blob Storage
+      run: az storage blob upload --account-name stdeploych001 --account-key gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g== --container-name stcdeploych001 --file web.tar.gz --name web.tar.gz    
+    
+    - name: Run reimage command
+      uses: azure/powershell@v1
+      with:
+        azPSVersion: '3.1.0'
+        inlineScript: |
+          az vmss list-instances -g rg-eshoponweb -n vmss-web-ch-001 --query [*].instanceId | ConvertFrom-Json | ForEach-Object {az vmss reimage -g rg-eshoponweb -n vmss-web-ch-001 --instance-id $_}
