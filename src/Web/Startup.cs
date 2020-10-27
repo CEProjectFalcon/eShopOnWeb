@@ -47,16 +47,11 @@ namespace Microsoft.eShopWeb.Web
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
-            if (_env.EnvironmentName == "Development")
-            {
-                // use in-memory database
-                ConfigureInMemoryDatabases(services);
-            }
-            else
-            {
-                // use real database
-                ConfigureProductionServices(services);
-            }
+            // use in-memory database
+            ConfigureInMemoryDatabases(services);
+
+            // use real database
+            //ConfigureProductionServices(services);
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
