@@ -1,5 +1,5 @@
 {
     "storageAccountName": "stdeploych001",
     "storageAccountKey": "gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g==",
-    "commandToExecute": "./eshoponweb.sh sql-eshoponweb-ch-001.database.windows.net eshopweb Senh4supersecre+a gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g=="
+    "commandToExecute": "./eshoponweb.sh sql-eshoponweb-ch-001.database.windows.net eshopweb Senh4supersecre+a 'http:\\/\\/eshoponwebch001\\.brazilsouth\\.cloudapp\\.azure\\.com\\/api\\/' stdeploych001 gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g=="
 }
