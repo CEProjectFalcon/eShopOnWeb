@@ -2,9 +2,9 @@ name: Criar imagens de contêiner para nossa solução
 
 on:
   push:
-    branches: [master]
+    branches: [capitulo6]
   pull_request:
-    branches: [master]
+    branches: [capitulo6]
 
 jobs:
   build:
