@@ -9,6 +9,7 @@ using Moq;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.eShopWeb.Web.Pages.Basket;
 
 namespace UnitTests
 {
@@ -66,7 +67,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public async void Add_An_Item_With_Two_Quantities_To_Basket()
+        public async void Add_An_Item_And_Set_Quantities_To_Basket()
         {
             //Arrange
             var mockRepository = new Mock<IAsyncRepository<Basket>>();
@@ -95,32 +96,31 @@ namespace UnitTests
             Assert.Equal(22, basket.Items.First().UnitPrice);
         }
 
-        public async void Add_Two_Items_To_Basket()
+        public async void Calculate_Total_Basket()
         {
             //Arrange
-            var mockRepository = new Mock<IAsyncRepository<Basket>>();
-            var mockLoger = new Mock<IAppLogger<BasketService>>();
+            var basketviewmodel = new BasketViewModel();
 
-            var basketid = 1;
-            var catalogitemid = 1;
-            var buyerid = "1";
+            //var basketid = 1;
+            //var catalogitemid = 1;
+            //var buyerid = "1";
 
-            var basket = new Basket(buyerid);
-            basket.AddItem(catalogitemid, 22);
+            //var basket = new Basket(buyerid);
+            //basket.AddItem(catalogitemid, 22);
 
-            var quantities = new Dictionary<string, int>() { { "0", 2 } };
+            //var quantities = new Dictionary<string, int>() { { "0", 2 } };
 
-            mockRepository.Setup(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>())).Returns(Task.FromResult(basket));
+            //mockRepository.Setup(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>())).Returns(Task.FromResult(basket));
 
-            var basketService = new BasketService(mockRepository.Object, mockLoger.Object);
+            //var basketService = new BasketService(mockRepository.Object, mockLoger.Object);
 
             //Act
-            await basketService.SetQuantities(basketid, quantities);
+            //await basketService.SetQuantities(basketid, quantities);
 
-            //Assert
-            Assert.Equal(1, basket.Items.Count);
-            Assert.Equal(2, basket.Items.First().Quantity);
-            Assert.Equal(catalogitemid, basket.Items.First().CatalogItemId);
+            ////Assert
+            //Assert.Equal(1, basket.Items.Count);
+            //Assert.Equal(2, basket.Items.First().Quantity);
+            //Assert.Equal(catalogitemid, basket.Items.First().CatalogItemId);
         }
 
     }
