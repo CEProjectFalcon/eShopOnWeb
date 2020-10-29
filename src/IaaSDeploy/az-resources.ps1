@@ -1,10 +1,12 @@
-$azureuser = az ad user list --display-name "Alexandre Teoi" --query [0].userPrincipalName
-$azuresubscription = "fcb2616f-096b-4e78-b6ee-72db022919b0"
-$resourcegroup = "rg-eshoponweb"
-$storageaccountname = "stdeploych001"
-$sqlservername = "sql-eshoponweb-ch-001"
-$scalesetname = "vmss-web-ch-001"
-$autoscalename = "vmssas-web-ch-001"
+param ([Parameter(Mandatory = $true)]$environment, [Parameter(Mandatory = $true)]$username, [Parameter(Mandatory = $true)]$azuresubscription)
+
+$azureuser = az ad user list --display-name $username --query [0].userPrincipalName
+$resourcegroup = "rg-eshoponweb-$environment"
+$storageaccountname = "stdeploy$environment"
+$sqlservername = "sql-eshoponweb-$environment"
+$scalesetname = "vmss-web-$environment"
+$autoscalename = "vmssas-web-$environment"
+$dnsName = "eshoponweb-$environment"
 $adminusername = "eshopadmin"
 $sqladminpassword = "s3nh@Comple*4"
 
@@ -19,7 +21,6 @@ az ad signed-in-user show --query objectId -o tsv | az role assignment create --
 az storage container create -n stcdeploych001 --account-name $storageaccountname --public-access off --auth-mode login
 az storage share create -n products --quota 10 --account-name $storageaccountname
 az storage share create -n dataprotection --quota 10 --account-name $storageaccountname
-az storage account keys list -g $resourcegroup -n $storageaccountname
 
 # Azure SQL Database
 az sql server create -g $resourcegroup -n $sqlservername -l brazilsouth --admin-user $adminusername --admin-password $sqladminpassword
@@ -31,9 +32,9 @@ az sql db create -g $resourcegroup -n Microsoft.eShopOnWeb.Identity -s $sqlserve
 az vmss create -g $resourcegroup -n $scalesetname --image UbuntuLTS --upgrade-policy-mode automatic --admin-username $adminusername --generate-ssh-keys
 ## DNS Name
 $publicip = az network public-ip list -g $resourcegroup --query "[?contains(name, '$scalesetname')].name" | ConvertFrom-Json
-az network public-ip update -g $resourcegroup -n $publicip --dns-name eshoponwebch001
+az network public-ip update -g $resourcegroup -n $publicip --dns-name $dnsName
 ## Application deployment
-az vmss extension set -g $resourcegroup -n CustomScript --publisher Microsoft.Azure.Extensions --version 2.0 --vmss-name $scalesetname --settings .\script-config.json --protected-settings .\protected-config.json
+az vmss extension set -g $resourcegroup -n CustomScript --publisher Microsoft.Azure.Extensions --version 2.0 --vmss-name $scalesetname --settings ".\script-config-$environment.json" --protected-settings ".\protected-config-$environment.json"
 ## Load Balancer configuration
 $loadbalancer = az network lb list -g $resourcegroup --query "[?contains(name, '$scalesetname')].name" | ConvertFrom-Json
 az network lb probe create -g $resourcegroup -n healtchecks --lb-name $loadbalancer --protocol http --port 80 --path /health
