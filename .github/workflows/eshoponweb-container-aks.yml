@@ -1,4 +1,4 @@
-name: Criar imagens de contêiner para nossa solução
+name: eshoponweb-container-aks
 
 on:
   push:
