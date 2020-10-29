@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.eShopWeb.Web.Features.MyOrders;
 using Microsoft.eShopWeb.Web.Features.OrderDetails;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.Web.Controllers
@@ -23,7 +25,7 @@ namespace Microsoft.eShopWeb.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> MyOrders()
         {
-            var viewModel = await _mediator.Send(new GetMyOrders(User.Identity.Name));
+            var viewModel = await _mediator.Send(new GetMyOrders(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault()));
 
             return View(viewModel);
         }
@@ -31,7 +33,7 @@ namespace Microsoft.eShopWeb.Web.Controllers
         [HttpGet("{orderId}")]
         public async Task<IActionResult> Detail(int orderId)
         {
-            var viewModel = await _mediator.Send(new GetOrderDetails(User.Identity.Name, orderId));
+            var viewModel = await _mediator.Send(new GetOrderDetails(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault(), orderId));
 
             if (viewModel == null)
             {

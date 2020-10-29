@@ -12,6 +12,7 @@ using Microsoft.eShopWeb.Web.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.Web.Pages.Basket
@@ -20,7 +21,7 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
     public class CheckoutModel : PageModel
     {
         private readonly IBasketService _basketService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        //private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IOrderService _orderService;
         private string _username = null;
         private readonly IBasketViewModelService _basketViewModelService;
@@ -28,12 +29,11 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
 
         public CheckoutModel(IBasketService basketService,
             IBasketViewModelService basketViewModelService,
-            SignInManager<ApplicationUser> signInManager,
             IOrderService orderService,
             IAppLogger<CheckoutModel> logger)
         {
             _basketService = basketService;
-            _signInManager = signInManager;
+            //_signInManager = signInManager;
             _orderService = orderService;
             _basketViewModelService = basketViewModelService;
             _logger = logger;
@@ -74,9 +74,9 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
 
         private async Task SetBasketModelAsync()
         {
-            if (_signInManager.IsSignedIn(HttpContext.User))
+            if (User.Identity.IsAuthenticated)
             {
-                BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Identity.Name);
+                BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
             }
             else
             {
