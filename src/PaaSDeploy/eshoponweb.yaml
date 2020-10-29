@@ -33,6 +33,8 @@ spec:
               value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
+            - name: APPCONFIG_CONNECTIONSTRING
+              value: X
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,6 +66,8 @@ spec:
               value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
+            - name: APPCONFIG_CONNECTIONSTRING
+              value: X
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -95,6 +99,8 @@ spec:
               value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
+            - name: APPCONFIG_CONNECTIONSTRING
+              value: X
 ---
 apiVersion: v1
 kind: Service
