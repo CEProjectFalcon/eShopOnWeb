@@ -9,7 +9,7 @@
                     <img class="esh-identity-image" src="~/images/arrow-down.png">
                 </section>
                 <section class="esh-identity-drop">
-                    @if (!User.IsInRole("Administrators"))
+                    @if (User.IsInRole("Administrators"))
                     {
                         <a class="esh-identity-item"
                            asp-page="/Admin/Index">

@@ -70,6 +70,7 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
         {
             if (User.Identity.IsAuthenticated)
             {
+                await TransferAnonymousBasketToUserAsync(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
                 BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
             }
             else
@@ -91,6 +92,19 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
             var cookieOptions = new CookieOptions { IsEssential = true };
             cookieOptions.Expires = DateTime.Today.AddYears(10);
             Response.Cookies.Append(Constants.BASKET_COOKIENAME, _username, cookieOptions);
+        }
+
+        private async Task TransferAnonymousBasketToUserAsync(string userName)
+        {
+            if (Request.Cookies.ContainsKey(Constants.BASKET_COOKIENAME))
+            {
+                var anonymousId = Request.Cookies[Constants.BASKET_COOKIENAME];
+                if (!String.IsNullOrEmpty(anonymousId) && anonymousId != userName)
+                {
+                    await _basketService.TransferBasketAsync(anonymousId, userName);
+                    Response.Cookies.Delete(Constants.BASKET_COOKIENAME);
+                }
+            }
         }
     }
 }
