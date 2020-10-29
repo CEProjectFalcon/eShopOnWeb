@@ -1,0 +1,59 @@
+name: Criar imagens de contêiner para nossa solução
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Azure Container Registry Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push - Web
+        run: |
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ steps.vars.outputs.sha_short }} -f ./src/Web/Dockerfile .
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ steps.vars.outputs.sha_short }}
+
+      - name: Build and Push - PublicApi
+        run: |
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ steps.vars.outputs.sha_short }} -f ./src/PublicApi/Dockerfile .
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ steps.vars.outputs.sha_short }}
+
+      - name: Build and Push - OrderApi
+        run: |
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ steps.vars.outputs.sha_short }} -f ./src/OrderApi/Dockerfile .
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ steps.vars.outputs.sha_short }}
+
+      - uses: Azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: aks-cluster
+          resource-group: rg-eshoponweb-cloud
+
+      - uses: Azure/k8s-deploy@v1
+        with:
+          manifests: |
+            src/PaaSDeploy/eshoponweb.yaml
+          images: |
+            ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ steps.vars.outputs.sha_short }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ steps.vars.outputs.sha_short }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ steps.vars.outputs.sha_short }}
