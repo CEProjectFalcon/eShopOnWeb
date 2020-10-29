@@ -13,12 +13,10 @@ namespace Microsoft.eShopWeb.Web.Pages.Shared.Components.BasketComponent
     public class Basket : ViewComponent
     {
         private readonly IBasketViewModelService _basketService;
-        //private readonly SignInManager<ApplicationUser> _signInManager;
 
         public Basket(IBasketViewModelService basketService)
         {
             _basketService = basketService;
-            //_signInManager = signInManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(string userName)
