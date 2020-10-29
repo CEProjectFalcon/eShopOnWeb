@@ -9,6 +9,7 @@ using Microsoft.eShopWeb.Web.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.Web.Pages.Basket
@@ -16,16 +17,15 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
     public class IndexModel : PageModel
     {
         private readonly IBasketService _basketService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        //private readonly SignInManager<ApplicationUser> _signInManager;
         private string _username = null;
         private readonly IBasketViewModelService _basketViewModelService;
 
         public IndexModel(IBasketService basketService,
-            IBasketViewModelService basketViewModelService,
-            SignInManager<ApplicationUser> signInManager)
+            IBasketViewModelService basketViewModelService)
         {
             _basketService = basketService;
-            _signInManager = signInManager;
+            //_signInManager = signInManager;
             _basketViewModelService = basketViewModelService;
         }
 
@@ -68,9 +68,10 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
 
         private async Task SetBasketModelAsync()
         {
-            if (_signInManager.IsSignedIn(HttpContext.User))
+            if (User.Identity.IsAuthenticated)
             {
-                BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Identity.Name);
+                await TransferAnonymousBasketToUserAsync(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
+                BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
             }
             else
             {
@@ -91,6 +92,19 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
             var cookieOptions = new CookieOptions { IsEssential = true };
             cookieOptions.Expires = DateTime.Today.AddYears(10);
             Response.Cookies.Append(Constants.BASKET_COOKIENAME, _username, cookieOptions);
+        }
+
+        private async Task TransferAnonymousBasketToUserAsync(string userName)
+        {
+            if (Request.Cookies.ContainsKey(Constants.BASKET_COOKIENAME))
+            {
+                var anonymousId = Request.Cookies[Constants.BASKET_COOKIENAME];
+                if (!String.IsNullOrEmpty(anonymousId) && anonymousId != userName)
+                {
+                    await _basketService.TransferBasketAsync(anonymousId, userName);
+                    Response.Cookies.Delete(Constants.BASKET_COOKIENAME);
+                }
+            }
         }
     }
 }

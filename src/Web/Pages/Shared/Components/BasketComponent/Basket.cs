@@ -5,6 +5,7 @@ using Microsoft.eShopWeb.Web.Interfaces;
 using Microsoft.eShopWeb.Web.Pages.Basket;
 using Microsoft.eShopWeb.Web.ViewModels;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.Web.Pages.Shared.Components.BasketComponent
@@ -12,13 +13,10 @@ namespace Microsoft.eShopWeb.Web.Pages.Shared.Components.BasketComponent
     public class Basket : ViewComponent
     {
         private readonly IBasketViewModelService _basketService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public Basket(IBasketViewModelService basketService,
-                        SignInManager<ApplicationUser> signInManager)
+        public Basket(IBasketViewModelService basketService)
         {
             _basketService = basketService;
-            _signInManager = signInManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(string userName)
@@ -30,9 +28,10 @@ namespace Microsoft.eShopWeb.Web.Pages.Shared.Components.BasketComponent
 
         private async Task<BasketViewModel> GetBasketViewModelAsync()
         {
-            if (_signInManager.IsSignedIn(HttpContext.User))
+            if (User.Identity.IsAuthenticated)
             {
-                return await _basketService.GetOrCreateBasketForUser(User.Identity.Name);
+                var user = User as ClaimsPrincipal;
+                return await _basketService.GetOrCreateBasketForUser(user.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
             }
             string anonymousId = GetBasketIdFromCookie();
             if (anonymousId == null) return new BasketViewModel();

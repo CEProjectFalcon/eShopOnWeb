@@ -56,8 +56,8 @@ namespace Microsoft.eShopWeb.PublicApi
             services.AddDbContext<CatalogContext>(c =>
                 c.UseInMemoryDatabase("Catalog"));
 
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseInMemoryDatabase("Identity"));
 
             ConfigureServices(services);
         }
@@ -70,9 +70,9 @@ namespace Microsoft.eShopWeb.PublicApi
             services.AddDbContext<CatalogContext>(c =>
                 c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
 
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            //// Add Identity DbContext
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
             ConfigureServices(services);
         }
@@ -86,9 +86,9 @@ namespace Microsoft.eShopWeb.PublicApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                    .AddEntityFrameworkStores<AppIdentityDbContext>()
-                    .AddDefaultTokenProviders();
+            //services.AddIdentity<ApplicationUser, IdentityRole>()
+            //        .AddEntityFrameworkStores<AppIdentityDbContext>()
+            //        .AddDefaultTokenProviders();
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.Configure<CatalogSettings>(Configuration);
