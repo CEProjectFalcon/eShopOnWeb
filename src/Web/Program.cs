@@ -54,7 +54,7 @@ namespace Microsoft.eShopWeb.Web
                                 .Connect(Environment.GetEnvironmentVariable("APPCONFIG_CONNECTIONSTRING"))
                                 .ConfigureKeyVault(kv =>
                                 {
-                                    kv.SetCredential(new ManagedIdentityCredential());
+                                    kv.SetCredential(new DefaultAzureCredential());
                                 })
                                 .Select(KeyFilter.Any, LabelFilter.Null)
                                 .Select(KeyFilter.Any, "Web")
