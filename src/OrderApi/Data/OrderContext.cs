@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace OrderingApi.Data
+namespace OrderApi.Data
 {
     public class OrderContext : DbContext
     {

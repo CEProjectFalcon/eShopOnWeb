@@ -50,7 +50,7 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
 
             var order = new Order(basket.BuyerId, shippingAddress, items);
             var httpContent = new StringContent(JsonSerializer.Serialize(order), Encoding.UTF8, "application/json");
-            var client = _clientFactory.CreateClient("ordering-api");
+            var client = _clientFactory.CreateClient("order-api");
             await client.PostAsync("/Order", httpContent).ConfigureAwait(false);
         }
     }

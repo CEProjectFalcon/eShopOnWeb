@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
-using OrderingApi.Entities;
+using OrderApi.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OrderingApi.Data
+namespace OrderApi.Data
 {
     /// <summary>
     /// "There's some repetition here - couldn't we have some the sync methods call the async?"

@@ -6,6 +6,6 @@
 
         public string ApiBase { get; set; }
         public string WebBase { get; set; }
-        public string OrderingBase { get; set; }
+        public string OrderBase { get; set; }
     }
 }

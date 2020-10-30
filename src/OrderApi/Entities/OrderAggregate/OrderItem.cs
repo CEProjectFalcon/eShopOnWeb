@@ -1,4 +1,4 @@
-﻿namespace OrderingApi.Entities.OrderAggregate
+﻿namespace OrderApi.Entities.OrderAggregate
 {
     public class OrderItem : BaseEntity
     {

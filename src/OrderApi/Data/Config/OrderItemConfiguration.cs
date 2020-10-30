@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OrderingApi.Entities.OrderAggregate;
+using OrderApi.Entities.OrderAggregate;
 
-namespace OrderingApi.Data.Config
+namespace OrderApi.Data.Config
 {
     public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     {

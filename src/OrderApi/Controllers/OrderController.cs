@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using OrderingApi.Entities.OrderAggregate;
-using OrderingApi.Interfaces;
+using OrderApi.Entities.OrderAggregate;
+using OrderApi.Interfaces;
 
-namespace OrderingApi.Controllers
+namespace OrderApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

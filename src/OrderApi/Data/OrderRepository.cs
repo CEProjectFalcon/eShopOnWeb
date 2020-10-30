@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using OrderingApi.Interfaces;
-using OrderingApi.Entities.OrderAggregate;
+using OrderApi.Interfaces;
+using OrderApi.Entities.OrderAggregate;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace OrderingApi.Data
+namespace OrderApi.Data
 {
     public class OrderRepository : EfRepository<Order>, IOrderRepository
     {

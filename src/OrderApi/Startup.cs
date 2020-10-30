@@ -4,13 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using OrderingApi.Data;
+using OrderApi.Data;
 using System.Reflection;
 using System;
 using Microsoft.OpenApi.Models;
-using OrderingApi.Interfaces;
+using OrderApi.Interfaces;
 
-namespace OrderingApi
+namespace OrderApi
 {
     public class Startup
     {

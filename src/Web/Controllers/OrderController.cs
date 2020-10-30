@@ -25,7 +25,7 @@ namespace Microsoft.eShopWeb.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> MyOrders()
         {
-            var client = _clientFactory.CreateClient("ordering-api");
+            var client = _clientFactory.CreateClient("order-api");
             var response = await client.GetAsync($"/Order/GetByBuyerId/{User.Identity.Name}").ConfigureAwait(false);
             var jsonString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var orders = JsonConvert.DeserializeObject<IReadOnlyList<Order>>(jsonString);
@@ -52,7 +52,7 @@ namespace Microsoft.eShopWeb.Web.Controllers
         [HttpGet("{orderId}")]
         public async Task<IActionResult> Detail(int orderId)
         {
-            var client = _clientFactory.CreateClient("ordering-api");
+            var client = _clientFactory.CreateClient("order-api");
             var response = await client.GetAsync($"/Order/{orderId}").ConfigureAwait(false);
             var jsonString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var order = JsonConvert.DeserializeObject<Order>(jsonString);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrderingApi.Entities.OrderAggregate
+namespace OrderApi.Entities.OrderAggregate
 {
     public class Order : BaseEntity
     {

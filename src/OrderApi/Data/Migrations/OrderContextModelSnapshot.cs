@@ -3,17 +3,14 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OrderingApi.Data;
+using OrderApi.Data;
 
-namespace OrderingApi.Migrations
+namespace OrderApi.Migrations
 {
     [DbContext(typeof(OrderContext))]
-    [Migration("20201026210140_InitialCreate")]
-    partial class InitialCreate
+    partial class OrderContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +18,7 @@ namespace OrderingApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("OrderingApi.Entities.OrderAggregate.Order", b =>
+            modelBuilder.Entity("OrderApi.Entities.OrderAggregate.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +36,7 @@ namespace OrderingApi.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("OrderingApi.Entities.OrderAggregate.OrderItem", b =>
+            modelBuilder.Entity("OrderApi.Entities.OrderAggregate.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,9 +59,9 @@ namespace OrderingApi.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("OrderingApi.Entities.OrderAggregate.Order", b =>
+            modelBuilder.Entity("OrderApi.Entities.OrderAggregate.Order", b =>
                 {
-                    b.OwnsOne("OrderingApi.Entities.OrderAggregate.Address", "ShipToAddress", b1 =>
+                    b.OwnsOne("OrderApi.Entities.OrderAggregate.Address", "ShipToAddress", b1 =>
                         {
                             b1.Property<int>("OrderId")
                                 .ValueGeneratedOnAdd()
@@ -104,13 +101,13 @@ namespace OrderingApi.Migrations
                         });
                 });
 
-            modelBuilder.Entity("OrderingApi.Entities.OrderAggregate.OrderItem", b =>
+            modelBuilder.Entity("OrderApi.Entities.OrderAggregate.OrderItem", b =>
                 {
-                    b.HasOne("OrderingApi.Entities.OrderAggregate.Order", null)
+                    b.HasOne("OrderApi.Entities.OrderAggregate.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId");
 
-                    b.OwnsOne("OrderingApi.Entities.OrderAggregate.CatalogItemOrdered", "ItemOrdered", b1 =>
+                    b.OwnsOne("OrderApi.Entities.OrderAggregate.CatalogItemOrdered", "ItemOrdered", b1 =>
                         {
                             b1.Property<int>("OrderItemId")
                                 .ValueGeneratedOnAdd()

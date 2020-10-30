@@ -153,10 +153,10 @@ namespace Microsoft.eShopWeb.Web
                 BaseAddress = new Uri(baseUrlConfig.WebBase)
             });
 
-            // Ordering Api
-            services.AddHttpClient("ordering-api", options =>
+            // OrderApi service
+            services.AddHttpClient("order-api", options =>
             {
-                options.BaseAddress = new Uri(baseUrlConfig.OrderingBase);
+                options.BaseAddress = new Uri(baseUrlConfig.OrderBase);
             });
 
             // add blazor services

@@ -1,4 +1,4 @@
-﻿using OrderingApi.Entities;
+﻿using OrderApi.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

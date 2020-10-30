@@ -1,9 +1,9 @@
 ﻿using Microsoft.eShopWeb.ApplicationCore.Interfaces;
-using OrderingApi.Entities.OrderAggregate;
+using OrderApi.Entities.OrderAggregate;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OrderingApi.Interfaces
+namespace OrderApi.Interfaces
 {
     public interface IOrderRepository : IAsyncRepository<Order>
     {

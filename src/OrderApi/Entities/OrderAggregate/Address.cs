@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OrderingApi.Entities.OrderAggregate
+namespace OrderApi.Entities.OrderAggregate
 {
     public class Address // ValueObject
     {
