@@ -95,33 +95,5 @@ namespace UnitTests
             Assert.Equal(catalogitemid, basket.Items.First().CatalogItemId);
             Assert.Equal(22, basket.Items.First().UnitPrice);
         }
-
-        public async void Calculate_Total_Basket()
-        {
-            //Arrange
-            var basketviewmodel = new BasketViewModel();
-
-            //var basketid = 1;
-            //var catalogitemid = 1;
-            //var buyerid = "1";
-
-            //var basket = new Basket(buyerid);
-            //basket.AddItem(catalogitemid, 22);
-
-            //var quantities = new Dictionary<string, int>() { { "0", 2 } };
-
-            //mockRepository.Setup(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>())).Returns(Task.FromResult(basket));
-
-            //var basketService = new BasketService(mockRepository.Object, mockLoger.Object);
-
-            //Act
-            //await basketService.SetQuantities(basketid, quantities);
-
-            ////Assert
-            //Assert.Equal(1, basket.Items.Count);
-            //Assert.Equal(2, basket.Items.First().Quantity);
-            //Assert.Equal(catalogitemid, basket.Items.First().CatalogItemId);
-        }
-
     }
 }
