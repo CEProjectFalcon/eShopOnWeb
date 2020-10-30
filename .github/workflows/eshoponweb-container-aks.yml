@@ -52,6 +52,24 @@ jobs:
           secret-name: APPCONFIG_CONNECTIONSTRING
           secret-value: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
 
+      - uses: jwsi/secret-parser@v1
+        with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: AZURE_CLIENT_ID
+          secret-value: ${{ secrets.AZURE_CLIENT_ID }}
+
+      - uses: jwsi/secret-parser@v1
+        with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: AZURE_CLIENT_SECRET
+          secret-value: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - uses: jwsi/secret-parser@v1
+        with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: AZURE_TENANT_ID
+          secret-value: ${{ secrets.AZURE_TENANT_ID }}
+
       - uses: Azure/k8s-deploy@v1
         with:
           namespace: "eshoponweb"

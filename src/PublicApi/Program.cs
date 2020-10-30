@@ -50,17 +50,16 @@ namespace Microsoft.eShopWeb.PublicApi
                     webBuilder.ConfigureAppConfiguration(config =>
                     {
                         var settings = config.Build();
-                        var credentials = new ManagedIdentityCredential();
-
                         config.AddAzureAppConfiguration(options =>
-                        {
-                            // teste
-                            options.Connect(new Uri("https://appconfig-eshoponweb.azconfig.io"), credentials)
+                            options
+                                .Connect(Environment.GetEnvironmentVariable("APPCONFIG_CONNECTIONSTRING"))
                                 .ConfigureKeyVault(kv =>
                                 {
-                                    kv.SetCredential(credentials);
-                                });
-                        });
+                                    kv.SetCredential(new DefaultAzureCredential());
+                                })
+                                .Select(KeyFilter.Any, LabelFilter.Null)
+                                .Select(KeyFilter.Any, "PublicApi")
+                        );
                     }).UseStartup<Startup>());
     }
 }
