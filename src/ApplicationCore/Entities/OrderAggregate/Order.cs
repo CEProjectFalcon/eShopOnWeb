@@ -12,15 +12,15 @@ namespace Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate
             // required by EF
         }
 
-        public Order(string buyerId, Address shipToAddress, List<OrderItem> items)
+        public Order(string buyerId, Address shipToAddress, List<OrderItem> orderItems)
         {
             Guard.Against.NullOrEmpty(buyerId, nameof(buyerId));
             Guard.Against.Null(shipToAddress, nameof(shipToAddress));
-            Guard.Against.Null(items, nameof(items));
+            Guard.Against.Null(orderItems, nameof(orderItems));
 
             BuyerId = buyerId;
             ShipToAddress = shipToAddress;
-            _orderItems = items;
+            _orderItems = orderItems;
         }
 
         public string BuyerId { get; private set; }

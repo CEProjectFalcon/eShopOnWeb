@@ -5,24 +5,27 @@ using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.ApplicationCore.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly IAsyncRepository<Order> _orderRepository;
         private readonly IUriComposer _uriComposer;
         private readonly IAsyncRepository<Basket> _basketRepository;
         private readonly IAsyncRepository<CatalogItem> _itemRepository;
+        private readonly IHttpClientFactory _clientFactory;
 
         public OrderService(IAsyncRepository<Basket> basketRepository,
             IAsyncRepository<CatalogItem> itemRepository,
-            IAsyncRepository<Order> orderRepository,
-            IUriComposer uriComposer)
+            IUriComposer uriComposer,
+            IHttpClientFactory clientFactory)
         {
-            _orderRepository = orderRepository;
             _uriComposer = uriComposer;
+            _clientFactory = clientFactory;
             _basketRepository = basketRepository;
             _itemRepository = itemRepository;
         }
@@ -42,13 +45,13 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             {
                 var catalogItem = catalogItems.First(c => c.Id == basketItem.CatalogItemId);
                 var itemOrdered = new CatalogItemOrdered(catalogItem.Id, catalogItem.Name, _uriComposer.ComposePicUri(catalogItem.PictureUri));
-                var orderItem = new OrderItem(itemOrdered, basketItem.UnitPrice, basketItem.Quantity);
-                return orderItem;
+                return new OrderItem(itemOrdered, basketItem.UnitPrice, basketItem.Quantity);
             }).ToList();
 
             var order = new Order(basket.BuyerId, shippingAddress, items);
-
-            await _orderRepository.AddAsync(order);
+            var httpContent = new StringContent(JsonSerializer.Serialize(order), Encoding.UTF8, "application/json");
+            var client = _clientFactory.CreateClient("ordering-api");
+            await client.PostAsync("/Order", httpContent).ConfigureAwait(false);
         }
     }
 }

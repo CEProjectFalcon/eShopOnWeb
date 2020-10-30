@@ -3,29 +3,35 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:17469",
-      "sslPort": 44315
+      "applicationUrl": "http://localhost:53043",
+      "sslPort": 44383
     }
   },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "launchUrl": "weatherforecast",
       "environmentVariables": {
         "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=rzKf-le-s0:Qr/wnWanyne9Ko4SU8/X;Secret=CxcBG3biE3UglbsF6xNyWvDhIjuizRKnwzOEQxQC4mE=",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Web - PROD": {
+    "OrderingApi": {
       "commandName": "Project",
       "launchBrowser": true,
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "launchUrl": "weatherforecast",
       "environmentVariables": {
-        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=rzKf-le-s0:Qr/wnWanyne9Ko4SU8/X;Secret=CxcBG3biE3UglbsF6xNyWvDhIjuizRKnwzOEQxQC4mE=",
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
+      "publishAllPorts": true,
+      "useSSL": true
     }
   }
 }

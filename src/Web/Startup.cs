@@ -144,7 +144,6 @@ namespace Microsoft.eShopWeb.Web
                 config.Path = "/allservices";
             });
 
-            
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
             services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
@@ -152,6 +151,12 @@ namespace Microsoft.eShopWeb.Web
             services.AddScoped<HttpClient>(s => new HttpClient
             {
                 BaseAddress = new Uri(baseUrlConfig.WebBase)
+            });
+
+            // Ordering Api
+            services.AddHttpClient("ordering-api", options =>
+            {
+                options.BaseAddress = new Uri(baseUrlConfig.OrderingBase);
             });
 
             // add blazor services
