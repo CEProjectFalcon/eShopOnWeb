@@ -55,7 +55,7 @@ namespace Microsoft.eShopWeb.PublicApi
                                 .Connect(Environment.GetEnvironmentVariable("APPCONFIG_CONNECTIONSTRING"))
                                 .ConfigureKeyVault(kv =>
                                 {
-                                    kv.SetCredential(new DefaultAzureCredential());
+                                    kv.SetCredential(new ManagedIdentityCredential());
                                 })
                                 .Select(KeyFilter.Any, LabelFilter.Null)
                                 .Select(KeyFilter.Any, "PublicApi")
