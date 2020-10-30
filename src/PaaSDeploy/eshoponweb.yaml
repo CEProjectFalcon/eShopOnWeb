@@ -34,7 +34,7 @@ spec:
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
-              value: X
+              value: "${{ secrets.APPCONFIG_CONNECTIONSTRING }}"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +67,7 @@ spec:
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
-              value: X
+              value: "${{ secrets.APPCONFIG_CONNECTIONSTRING }}"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -100,7 +100,7 @@ spec:
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
-              value: X
+              value: "${{ secrets.APPCONFIG_CONNECTIONSTRING }}"
 ---
 apiVersion: v1
 kind: Service

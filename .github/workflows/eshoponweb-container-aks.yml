@@ -23,21 +23,21 @@ jobs:
 
       - name: Build and Push - Web
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }} -f ./src/Web/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ event.run_id }} -f ./src/Web/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ event.run_id }}
 
       - name: Build and Push - PublicApi
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }} -f ./src/PublicApi/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ event.run_id }} -f ./src/PublicApi/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ event.run_id }}
 
       - name: Build and Push - OrderApi
         run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }} -f ./src/OrderApi/Dockerfile .
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ event.run_id }} -f ./src/OrderApi/Dockerfile .
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }}
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ event.run_id }}
 
       - uses: Azure/aks-set-context@v1
         with:
@@ -46,18 +46,18 @@ jobs:
           resource-group: rg-eshoponweb-cloud
         id: login
 
+      - uses: jwsi/secret-parser@v1
+        with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: APPCONFIG_CONNECTIONSTRING
+          secret-value: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
+
       - uses: Azure/k8s-deploy@v1
         with:
           namespace: "eshoponweb"
           manifests: |
             src/PaaSDeploy/eshoponweb.yaml
           images: |
-            ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
-            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }}
-            ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }}
-
-      - name: Alterar ENV APPCONFIG_CONNECTIONSTRING dos Deployments
-        run: |
-          kubectl set env deployment/web-deploy APPCONFIG_CONNECTIONSTRING=${{ secrets.APPCONFIG_CONNECTIONSTRING }}
-          kubectl set env deployment/publicapi-deploy APPCONFIG_CONNECTIONSTRING=${{ secrets.APPCONFIG_CONNECTIONSTRING }}
-          kubectl set env deployment/orderapi-deploy APPCONFIG_CONNECTIONSTRING=${{ secrets.APPCONFIG_CONNECTIONSTRING }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ event.run_id }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ event.run_id }}
+            ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ event.run_id }}
