@@ -44,6 +44,7 @@ jobs:
           creds: "${{ secrets.AZURE_CREDENTIALS }}"
           cluster-name: aks-cluster
           resource-group: rg-eshoponweb-cloud
+        id: login
 
       - uses: Azure/k8s-deploy@v1
         with:
