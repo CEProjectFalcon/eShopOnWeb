@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine3.12 AS Build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS Build
 
 WORKDIR /app
 COPY . .
@@ -8,7 +8,7 @@ RUN dotnet restore
 RUN dotnet build
 RUN dotnet publish -c Release -o /out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine3.12 as Deploy
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim as Deploy
 WORKDIR /app
 COPY --from=Build /out .
 

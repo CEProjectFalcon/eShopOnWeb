@@ -29,10 +29,10 @@ spec:
             requests:
               memory: "100M"
           env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
+            - name: APPCONFIG_CONNECTIONSTRING
+              value: "${{ secrets.APPCONFIG_CONNECTIONSTRING }}"
             - name: AZURE_CLIENT_ID
               value: "${{ secrets.AZURE_CLIENT_ID }}"
             - name: AZURE_CLIENT_SECRET
@@ -66,8 +66,6 @@ spec:
             requests:
               memory: "80M"
           env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
@@ -105,8 +103,6 @@ spec:
             requests:
               memory: "80M"
           env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Docker
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
