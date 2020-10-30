@@ -29,6 +29,8 @@ spec:
             requests:
               memory: "100M"
           env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
@@ -66,6 +68,8 @@ spec:
             requests:
               memory: "80M"
           env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
@@ -103,6 +107,8 @@ spec:
             requests:
               memory: "80M"
           env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
