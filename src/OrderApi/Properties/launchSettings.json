@@ -11,7 +11,8 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchUrl": "weatherforecast",
+      "launchBrowser": true,
+      "launchUrl": "/",
       "environmentVariables": {
         "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -20,10 +21,12 @@
     "OrderApi": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "/",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
+        "ASPNETCORE_ENVIRONMENT": "Production"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "https://localhost:5044;http://localhost:5043"
     },
     "Docker": {
       "commandName": "Docker",

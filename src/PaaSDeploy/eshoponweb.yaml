@@ -30,7 +30,7 @@ spec:
               memory: "100M"
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: Kubernetes
+              value: Production
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
@@ -69,7 +69,7 @@ spec:
               memory: "80M"
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: Kubernetes
+              value: Production
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
@@ -108,7 +108,7 @@ spec:
               memory: "80M"
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: Kubernetes
+              value: Production
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: APPCONFIG_CONNECTIONSTRING
