@@ -36,12 +36,10 @@ namespace Microsoft.eShopWeb.Web
     public class Startup
     {
         private IServiceCollection _services;
-        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -89,6 +87,9 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetSection("DataProtectionPath").Value));
+
             ConfigureServices(services);
         }
 
@@ -101,12 +102,6 @@ namespace Microsoft.eShopWeb.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_env.IsProduction())
-            {
-                services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetSection("DataProtectionPath").Value));
-            }
-
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
             services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
