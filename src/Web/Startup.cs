@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
+using Azure.Identity;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -82,6 +83,12 @@ namespace Microsoft.eShopWeb.Web
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+
+            var dataProtectionConfig = new DataProtectionConfig();
+            Configuration.Bind(DataProtectionConfig.CONFIG_NAME, dataProtectionConfig);
+            services.AddDataProtection()
+                .PersistKeysToAzureBlobStorage(dataProtectionConfig.StorageAccountConnectionString, "dataprotection", "keystore")
+                .ProtectKeysWithAzureKeyVault(new Uri(dataProtectionConfig.KeyVaultUri), new DefaultAzureCredential());
 
             ConfigureServices(services);
         }
