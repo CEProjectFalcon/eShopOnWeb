@@ -202,7 +202,7 @@ namespace Microsoft.eShopWeb.Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseShowAllServicesMiddleware();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
                 app.UseWebAssemblyDebugging();
             }
             else
