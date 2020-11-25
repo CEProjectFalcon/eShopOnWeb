@@ -2,9 +2,9 @@ name: eshoponweb-container-aks
 
 on:
   push:
-    branches: [dotnet5]
+    branches: [capitulo6]
   pull_request:
-    branches: [dotnet5]
+    branches: [capitulo6]
 
 jobs:
   build:
