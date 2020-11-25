@@ -28,6 +28,7 @@
     </environment>
     <link href="css/admin.css" rel="stylesheet" />
     <script src="_content/BlazorInputFile/inputfile.js"></script>
+    <link href="BlazorAdmin.styles.css" rel="stylesheet" />
     <script>
 
         window.getCookie = (cname) => {
@@ -66,10 +67,9 @@
     </script>
 </head>
 <body>
-    <admin>@(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))</admin>
+    <div id="admin">@(await Html.RenderComponentAsync<App>(RenderMode.Server))</div>
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-
 </body>
 </html>
 
