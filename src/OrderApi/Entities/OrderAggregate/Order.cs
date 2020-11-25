@@ -10,11 +10,11 @@ namespace OrderApi.Entities.OrderAggregate
             // required by EF
         }
 
-        public Order(string buyerId, Address shipToAddress, List<OrderItem> items)
+        public Order(string buyerId, Address shipToAddress, List<OrderItem> orderItems)
         {
             BuyerId = buyerId;
             ShipToAddress = shipToAddress;
-            OrderItems = items;
+            OrderItems = orderItems;
         }
 
         public string BuyerId { get; set; }
