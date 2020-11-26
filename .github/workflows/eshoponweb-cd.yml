@@ -30,8 +30,8 @@ jobs:
       - name: Build Web
         run: dotnet build src/Web/Web.csproj --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test UnitTests/UnitTests.csproj --no-restore --verbosity normal
+      # - name: Test
+      #   run: dotnet test UnitTests/UnitTests.csproj --no-restore --verbosity normal
 
       - name: Publish Public API
         run: dotnet publish src/PublicApi/PublicApi.csproj --configuration Release --output PublicApiPublish --no-restore
