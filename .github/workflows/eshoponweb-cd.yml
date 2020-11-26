@@ -1,4 +1,4 @@
-name: eshoponweb-container-aks
+name: eshoponweb-cd
 
 on:
   push:
@@ -11,8 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build Public API
+        run: dotnet build src/PublicApi/PublicApi.csproj --configuration Release --no-restore
+
+      - name: Build Order API
+        run: dotnet build src/OrderApi/OrderApi.csproj --configuration Release --no-restore
+
+      - name: Build Web
+        run: dotnet build src/Web/Web.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test UnitTests/UnitTests.csproj --no-restore --verbosity normal
+
+      - name: Publish Public API
+        run: dotnet publish src/PublicApi/PublicApi.csproj --configuration Release --output PublicApiPublish --no-restore
+
+      - name: Publish Order API
+        run: dotnet publish src/OrderApi/OrderApi.csproj --configuration Release --output OrderApiPublish --no-restore
+
+      - name: Publish Web
+        run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
 
       - name: Azure Container Registry Login
         uses: azure/docker-login@v1
@@ -20,12 +48,6 @@ jobs:
           login-server: ${{ secrets.ACR_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-
-      - name: Build and Push - Web
-        run: |
-          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }} -f ./src/Web/Dockerfile .
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest
-          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
 
       - name: Build and Push - PublicApi
         run: |
@@ -39,38 +61,50 @@ jobs:
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest
           docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }}
 
-      - uses: Azure/aks-set-context@v1
+      - name: Build and Push - Web
+        run: |
+          docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }} -f ./src/Web/Dockerfile .
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest
+          docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
+
+      - name: Login AKS Cluster
+        uses: Azure/aks-set-context@v1
         with:
           creds: "${{ secrets.AZURE_CREDENTIALS }}"
           cluster-name: aks-cluster
           resource-group: rg-eshoponweb-cloud
         id: login
 
-      - uses: jwsi/secret-parser@v1
+      - name: YAML Transform - APPCONFIG_CONNECTIONSTRING
+        uses: jwsi/secret-parser@v1
         with:
           filename: src/PaaSDeploy/eshoponweb.yaml
           secret-name: APPCONFIG_CONNECTIONSTRING
           secret-value: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
 
-      - uses: jwsi/secret-parser@v1
+      - name: YAML Transform - AZURE_CLIENT_ID
+        uses: jwsi/secret-parser@v1
         with:
           filename: src/PaaSDeploy/eshoponweb.yaml
           secret-name: AZURE_CLIENT_ID
           secret-value: ${{ secrets.AZURE_CLIENT_ID }}
 
-      - uses: jwsi/secret-parser@v1
+      - name: YAML Transform - AZURE_CLIENT_SECRET
+        uses: jwsi/secret-parser@v1
         with:
           filename: src/PaaSDeploy/eshoponweb.yaml
           secret-name: AZURE_CLIENT_SECRET
           secret-value: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - uses: jwsi/secret-parser@v1
+      - name: YAML Transform - AZURE_TENANT_ID
+        uses: jwsi/secret-parser@v1
         with:
           filename: src/PaaSDeploy/eshoponweb.yaml
           secret-name: AZURE_TENANT_ID
           secret-value: ${{ secrets.AZURE_TENANT_ID }}
 
-      - uses: Azure/k8s-deploy@v1
+      - name: Kubernetes Deploy
+        uses: Azure/k8s-deploy@v1
         with:
           namespace: "eshoponweb"
           manifests: |
