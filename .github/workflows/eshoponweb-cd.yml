@@ -33,6 +33,9 @@ jobs:
     - name: Publish Web
       run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
     
+    - name: Test
+      run: dotnet test UnitTests/UnitTests.csproj --no-restore --verbosity normal
+    
     - name: Tar API
       run: tar -czvf api.tar.gz -C ApiPublish .
     
