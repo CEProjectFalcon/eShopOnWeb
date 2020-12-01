@@ -52,12 +52,10 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        id: init
         run: terraform init
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
+      - name: Terraform Plan
+        run: terraform plan -var="keyvault-serviceprincipal=${{ secrets.KEY_VAULT_SERVICE_PRINCIPAL_ID }}"
 
       - name: Terraform Apply
         run: terraform apply -var="keyvault-serviceprincipal=${{ secrets.KEY_VAULT_SERVICE_PRINCIPAL_ID }}" -auto-approve
