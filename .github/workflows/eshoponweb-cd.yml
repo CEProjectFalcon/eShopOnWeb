@@ -10,6 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -41,6 +47,20 @@ jobs:
 
       - name: Publish Web
         run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Apply
+        run: terraform apply -var="keyvault-serviceprincipal=${{ secrets.KEY_VAULT_SERVICE_PRINCIPAL_ID }}" -auto-approve
 
       - name: Azure Container Registry Login
         uses: azure/docker-login@v1
