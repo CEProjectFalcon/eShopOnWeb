@@ -50,6 +50,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          tf_actions_working_dir: src/PaaSDeploy/
 
       - name: Terraform Init
         id: init
