@@ -2,9 +2,9 @@ name: eshoponweb-ci
 
 on:
   push:
-    branches: [capitulo6]
+    branches: [master]
   pull_request:
-    branches: [capitulo6]
+    branches: [master]
 
 jobs:
   build:
