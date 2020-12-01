@@ -57,7 +57,7 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled            = true
 }
 
-# Log Analytics Workspace
+# Log Analytics - Workspace
 resource "azurerm_log_analytics_workspace" "log" {
   name                = "log-eshoponweb-aks-cluster"
   location            = var.location
@@ -65,7 +65,7 @@ resource "azurerm_log_analytics_workspace" "log" {
   sku                 = "Free"
 }
 
-# Log Analytics Solution
+# Log Analytics - Solution
 resource "azurerm_log_analytics_solution" "solution" {
   solution_name         = "Containers"
   workspace_resource_id = azurerm_log_analytics_workspace.log.id
