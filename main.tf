@@ -8,7 +8,6 @@ variable "location" {
 
 variable "keyvault-serviceprincipal" {
   description = "Informe o ID do SP-RBAC para o Azure Key Vault"
-  default = "df9c4bb0-360e-47fb-b11f-85c4fc45faf7"
 }
 
 data "azurerm_client_config" "current" {}
