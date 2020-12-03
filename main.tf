@@ -1,3 +1,13 @@
+# TF Remote State - Storage Account
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-eshoponweb"
+    storage_account_name = "steshopdata"
+    container_name       = "tfstate"
+    key                  = "prod.terraform.tfstate"
+  }
+}
+
 provider "azurerm" {
   features {}
 }
@@ -12,28 +22,10 @@ variable "keyvault-serviceprincipal" {
 
 data "azurerm_client_config" "current" {}
 
-# TF Remote State - Storage Account
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-eshoponweb"
-    storage_account_name = "steshopdata"
-    container_name       = "tfstate"
-    key                  = "prod.terraform.tfstate"
-  }
-}
-
 # Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = "rg-eshoponweb-cloud"
   location = var.location
-}
-
-# Azure App Configuration
-resource "azurerm_app_configuration" "appconfig" {
-  name                = "appconfig-eshoponweb"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = var.location
-  sku                 = "standard"
 }
 
 # Azure Key Vault
@@ -58,6 +50,14 @@ resource "azurerm_key_vault" "keyvault" {
       "Delete", "Get", "List", "Set"
     ]
   }
+}
+
+# Azure App Configuration
+resource "azurerm_app_configuration" "appconfig" {
+  name                = "appconfig-eshoponweb"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  sku                 = "standard"
 }
 
 # Azure Container Registry
