@@ -162,32 +162,3 @@ resource "azurerm_role_assignment" "aks-acr" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks-cluster.kubelet_identity[0].object_id
 }
-
-# # HELM ingress-nginx
-# resource "helm_release" "nginx-ingress" {
-#   name              = "nginx-ingress"
-#   repository        = "https://kubernetes.github.io/ingress-nginx"
-#   chart             = "ingress-nginx"
-#   namespace         = "ingress-controller"
-#   create_namespace  = true
-
-#   set {
-#     name  = "controller.replicaCount"
-#     value = "2"
-#   }
-
-#   set {
-#     name  = "controller.nodeSelector.beta.kubernetes.io/os"
-#     value = "linux"
-#   }
-
-#   set {
-#     name  = "defaultBackend.nodeSelector.beta.kubernetes.io/os"
-#     value = "linux"
-#   }
-
-#   set {
-#     name  = "controller.admissionWebhooks.patch.nodeSelector.beta.kubernetes.io/os"
-#     value = "linux"
-#   }
-# }
