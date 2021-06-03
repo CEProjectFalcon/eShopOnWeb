@@ -16,16 +16,16 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-          dotnet-version: 5.0.x
+        dotnet-version: 5.0.x
     
     - name: Install dependencies
       run: dotnet restore
     
-      - name: Build Public API
+    - name: Build Public API
       run: dotnet build src/PublicApi/PublicApi.csproj --configuration Release --no-restore
     
-      - name: Build Order API
-        run: dotnet build src/OrderApi/OrderApi.csproj --configuration Release --no-restore
+    - name: Build Order API
+      run: dotnet build src/OrderApi/OrderApi.csproj --configuration Release --no-restore
 
     - name: Build Web
       run: dotnet build src/Web/Web.csproj --configuration Release --no-restore
