@@ -24,12 +24,10 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
 
         public OrderService(IAsyncRepository<Basket> basketRepository,
             IAsyncRepository<CatalogItem> itemRepository,
-            IAsyncRepository<Order> orderRepository,
             IUriComposer uriComposer, 
             TelemetryClient telemetryClient,
             IHttpClientFactory clientFactory)
         {
-            _orderRepository = orderRepository;
             _uriComposer = uriComposer;
             _clientFactory = clientFactory;
             _basketRepository = basketRepository;
