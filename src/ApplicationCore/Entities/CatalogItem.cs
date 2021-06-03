@@ -63,7 +63,8 @@ namespace Microsoft.eShopWeb.ApplicationCore.Entities
                 PictureUri = string.Empty;
                 return;
             }
-            PictureUri = $"images\\products\\{pictureName}?{new DateTime().Ticks}";
+            //PictureUri = $"images\\products\\{pictureName}?{new DateTime().Ticks}";
+            PictureUri = $"http://catalogbaseurltobereplaced/catalogimages/{pictureName}?{new DateTime().Ticks}";
         }
     }
 }

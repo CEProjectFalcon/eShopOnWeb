@@ -88,10 +88,36 @@ namespace Microsoft.eShopWeb.Web.Areas.Identity.Pages.Account
                             values: new { userId = user.Id, code = code },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        _telemetryClient.TrackTrace(String.Format("Token de confirmação gerado para {0}", Input.Email));
+
+                        var success = false;
+                        var startTime = DateTime.UtcNow;
+                        var timer = System.Diagnostics.Stopwatch.StartNew();
+
+                        try
+                        {
+                            await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
+                            _telemetryClient.TrackTrace(String.Format("Envio de e-mail de confirmação para {0}", Input.Email));
+
+                            success = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            success = false;
+                            _telemetryClient.TrackException(ex);
+                        }
+                        finally
+                        {
+                            timer.Stop();
+                            _telemetryClient.TrackDependency("Envio de e-mail", "_emailSender", "SendEmailAsync", startTime, timer.Elapsed, success);
+                        }
+                       
+
                         await _signInManager.SignInAsync(user, isPersistent: false);
+
+                        _telemetryClient.TrackTrace(String.Format("Primeiro signin efetuado por {0}", Input.Email));
 
                         _telemetryClient.StopOperation(operation);
                     }
