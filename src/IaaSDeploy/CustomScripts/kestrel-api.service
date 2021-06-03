@@ -1,0 +1,18 @@
+[Unit]
+Description=eShopOnWeb API
+
+[Service]
+WorkingDirectory=/var/www/eshoponweb/api
+ExecStart=/usr/bin/dotnet /var/www/eshoponweb/api/PublicApi.dll
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=eshoponweb-api
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=ASPNETCORE_URLS=http://*:9000
+
+[Install]
+WantedBy=multi-user.target

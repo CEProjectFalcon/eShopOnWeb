@@ -26,6 +26,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.eShopWeb.Web.Mentoring;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Azure.Identity;
 
 namespace Microsoft.eShopWeb.Web
@@ -102,8 +106,11 @@ namespace Microsoft.eShopWeb.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCookieSettings();
+            services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 
+            services.AddCookieSettings();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -217,6 +224,11 @@ namespace Microsoft.eShopWeb.Web
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            
             app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();

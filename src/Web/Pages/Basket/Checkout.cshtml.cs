@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,18 +26,20 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
         private string _username = null;
         private readonly IBasketViewModelService _basketViewModelService;
         private readonly IAppLogger<CheckoutModel> _logger;
+        private readonly TelemetryClient _telemetryClient;
 
         public CheckoutModel(IBasketService basketService,
             IBasketViewModelService basketViewModelService,
             SignInManager<ApplicationUser> signInManager,
             IOrderService orderService,
-            IAppLogger<CheckoutModel> logger)
+            IAppLogger<CheckoutModel> logger, TelemetryClient telemetryClient)
         {
             _basketService = basketService;
             _signInManager = signInManager;
             _orderService = orderService;
             _basketViewModelService = basketViewModelService;
             _logger = logger;
+            _telemetryClient = telemetryClient;
         }
 
         public BasketViewModel BasketModel { get; set; } = new BasketViewModel();
@@ -68,6 +71,8 @@ namespace Microsoft.eShopWeb.Web.Pages.Basket
                 _logger.LogWarning(emptyBasketOnCheckoutException.Message);
                 return RedirectToPage("/Basket/Index");
             }
+
+            _telemetryClient.TrackEvent("Order submitted succesfully");
 
             return RedirectToPage("Success");
         }

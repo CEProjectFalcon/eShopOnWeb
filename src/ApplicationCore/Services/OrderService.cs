@@ -1,9 +1,11 @@
 ﻿using Ardalis.GuardClauses;
+using Microsoft.ApplicationInsights;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -17,17 +19,22 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
         private readonly IUriComposer _uriComposer;
         private readonly IAsyncRepository<Basket> _basketRepository;
         private readonly IAsyncRepository<CatalogItem> _itemRepository;
+        private readonly TelemetryClient _telemetryClient;
         private readonly IHttpClientFactory _clientFactory;
 
         public OrderService(IAsyncRepository<Basket> basketRepository,
             IAsyncRepository<CatalogItem> itemRepository,
-            IUriComposer uriComposer,
+            IAsyncRepository<Order> orderRepository,
+            IUriComposer uriComposer, 
+            TelemetryClient telemetryClient,
             IHttpClientFactory clientFactory)
         {
+            _orderRepository = orderRepository;
             _uriComposer = uriComposer;
             _clientFactory = clientFactory;
             _basketRepository = basketRepository;
             _itemRepository = itemRepository;
+            _telemetryClient = telemetryClient;
         }
 
         public async Task CreateOrderAsync(int basketId, Address shippingAddress)
@@ -52,6 +59,10 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             var httpContent = new StringContent(JsonSerializer.Serialize(order), Encoding.UTF8, "application/json");
             var client = _clientFactory.CreateClient("order-api");
             await client.PostAsync("/Order", httpContent).ConfigureAwait(false);
+
+            double orderTotal = Decimal.ToDouble(order.Total());
+            _telemetryClient.GetMetric("Total Orders Value").TrackValue(orderTotal);
+
         }
     }
 }
