@@ -20,8 +20,8 @@ namespace Microsoft.eShopWeb.Web.Configuration
             {
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
+                //options.LoginPath = "/Account/Login";
+                //options.LogoutPath = "/Account/Logout";
                 options.Cookie = new CookieBuilder
                 {
                     IsEssential = true // required for auth to work without explicit user consent; adjust to suit your privacy policy

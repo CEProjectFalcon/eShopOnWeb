@@ -26,6 +26,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
+using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.eShopWeb.Web.Mentoring;
+using Microsoft.ApplicationInsights.DependencyCollector;
+using Azure.Identity;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -64,9 +71,9 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<CatalogContext>(c =>
                 c.UseInMemoryDatabase("Catalog"));
 
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
+            //// Add Identity DbContext
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseInMemoryDatabase("Identity"));
 
             ConfigureServices(services);
         }
@@ -79,9 +86,12 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<CatalogContext>(c =>
                 c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
 
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            var dataProtectionConfig = new DataProtectionConfig();
+            Configuration.Bind(DataProtectionConfig.CONFIG_NAME, dataProtectionConfig);
+            services.AddDataProtection()
+                .PersistKeysToAzureBlobStorage(dataProtectionConfig.StorageAccountConnectionString, "dataprotection", "keystore")
+                .ProtectKeysWithAzureKeyVault(new Uri(dataProtectionConfig.KeyVaultUri), new DefaultAzureCredential());
+
 
             services.AddHttpClient("ordering-api", options =>
             {
@@ -100,23 +110,14 @@ namespace Microsoft.eShopWeb.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
+
             services.AddCookieSettings();
 
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                    options.Cookie.SameSite = SameSiteMode.Lax;
-                });
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                       .AddDefaultUI()
-                       .AddEntityFrameworkStores<AppIdentityDbContext>()
-                                       .AddDefaultTokenProviders();
-
-            services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
+            services.AddAuthentication(AzureADB2CDefaults.AuthenticationScheme)
+                .AddAzureADB2C(options => Configuration.Bind("AzureAdB2C", options));
 
             services.AddCoreServices(Configuration);
             services.AddWebServices(Configuration);
@@ -149,7 +150,6 @@ namespace Microsoft.eShopWeb.Web
                 config.Path = "/allservices";
             });
 
-            
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
             services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
@@ -157,6 +157,12 @@ namespace Microsoft.eShopWeb.Web
             services.AddScoped<HttpClient>(s => new HttpClient
             {
                 BaseAddress = new Uri(baseUrlConfig.WebBase)
+            });
+
+            // OrderApi service
+            services.AddHttpClient("order-api", options =>
+            {
+                options.BaseAddress = new Uri(baseUrlConfig.OrderBase);
             });
 
             // add blazor services
@@ -195,7 +201,7 @@ namespace Microsoft.eShopWeb.Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseShowAllServicesMiddleware();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
                 app.UseWebAssemblyDebugging();
             }
             else
@@ -210,6 +216,11 @@ namespace Microsoft.eShopWeb.Web
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            
             app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();

@@ -6,20 +6,27 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.Infrastructure.Data;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.eShopWeb.Infrastructure.Data.Config;
 
 namespace Microsoft.eShopWeb.Infrastructure.Services
 {
     public class WebFileSystem: IFileSystem
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _url;
-        public const string AUTH_KEY = "AuthKeyOfDoomThatMustBeAMinimumNumberOfBytes";
+        //private readonly HttpClient _httpClient;
+        //private readonly string _url;
+        //public const string AUTH_KEY = "AuthKeyOfDoomThatMustBeAMinimumNumberOfBytes";
 
-        public WebFileSystem(string url)
+        private readonly StorageConfiguration _options; 
+
+        public WebFileSystem(IOptions<StorageConfiguration> options)
         {
-            _url = url;
-            _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Add("auth-key", AUTH_KEY);
+            //_url = url;
+            //_httpClient = new HttpClient();
+            //_httpClient.DefaultRequestHeaders.Add("auth-key", AUTH_KEY);
+            _options = options.Value; 
         }
 
         public async Task<bool> SavePicture(string pictureName, string pictureBase64)
@@ -44,18 +51,17 @@ namespace Microsoft.eShopWeb.Infrastructure.Services
 
         private async Task<bool> UploadToWeb(string fileName, byte[] fileData)
         {
-            var request = new FileItem
-            {
-                DataBase64 = Convert.ToBase64String(fileData), 
-                FileName = fileName
-            };
-            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_options.ConnectionString);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(_options.Container);
 
-            using var message = await _httpClient.PostAsync(_url, content);
-            if (!message.IsSuccessStatusCode)
-            {
-                return false;
-            }
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+            MemoryStream stream = new MemoryStream(fileData);
+            await blobClient.UploadAsync(stream, new BlobUploadOptions { 
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType=$"image/{fileName.Substring(fileName.LastIndexOf('.')+1)}"
+                }
+            }); 
 
             return true;
         }
