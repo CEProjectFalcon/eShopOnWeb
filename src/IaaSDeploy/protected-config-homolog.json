@@ -1,0 +1,5 @@
+{
+    "storageAccountName": "stdeployhomolog",
+    "storageAccountKey": "gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g==",
+    "commandToExecute": "./eshoponweb.sh sql-eshoponweb-homolog.database.windows.net eshopweb Senh4supersecre+a 'http:\\/\\/eshoponweb-homolog\\.brazilsouth\\.cloudapp\\.azure\\.com\\/api\\/' stdeployhomolog gEx5G4RIByEoLogn2enPyf7v6rZJBQuTTZ6L7cHL/NDZbiqInN76YHgfpSnUSyjAFgHzA2Mo+fccMa/voxaf0g=="
+}

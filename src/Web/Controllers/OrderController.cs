@@ -1,11 +1,11 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.eShopWeb.Web.Features.MyOrders;
-using Microsoft.eShopWeb.Web.Features.OrderDetails;
+using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
+using Microsoft.eShopWeb.Web.ViewModels;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.Web.Controllers
@@ -15,17 +15,36 @@ namespace Microsoft.eShopWeb.Web.Controllers
     [Route("[controller]/[action]")]
     public class OrderController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public OrderController(IMediator mediator)
+        public OrderController(IHttpClientFactory clientFactory)
         {
-            _mediator = mediator;
+            _clientFactory = clientFactory;
         }
 
         [HttpGet]
         public async Task<IActionResult> MyOrders()
         {
-            var viewModel = await _mediator.Send(new GetMyOrders(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault()));
+            var client = _clientFactory.CreateClient("order-api");
+            var response = await client.GetAsync($"/Order/GetByBuyerId/{User.Identity.Name}").ConfigureAwait(false);
+            var jsonString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var orders = JsonConvert.DeserializeObject<IReadOnlyList<Order>>(jsonString);
+
+            var viewModel = orders.Select(o => new OrderViewModel
+            {
+                OrderDate = o.OrderDate,
+                OrderItems = o.OrderItems?.Select(oi => new OrderItemViewModel()
+                {
+                    PictureUrl = oi.ItemOrdered.PictureUri,
+                    ProductId = oi.ItemOrdered.CatalogItemId,
+                    ProductName = oi.ItemOrdered.ProductName,
+                    UnitPrice = oi.UnitPrice,
+                    Units = oi.Units
+                }).ToList(),
+                OrderNumber = o.Id,
+                ShippingAddress = o.ShipToAddress,
+                Total = o.Total()
+            });
 
             return View(viewModel);
         }
@@ -33,12 +52,31 @@ namespace Microsoft.eShopWeb.Web.Controllers
         [HttpGet("{orderId}")]
         public async Task<IActionResult> Detail(int orderId)
         {
-            var viewModel = await _mediator.Send(new GetOrderDetails(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault(), orderId));
+            var client = _clientFactory.CreateClient("order-api");
+            var response = await client.GetAsync($"/Order/{orderId}").ConfigureAwait(false);
+            var jsonString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var order = JsonConvert.DeserializeObject<Order>(jsonString);
 
-            if (viewModel == null)
+            if (!order.BuyerId.Equals(User.Identity.Name, System.StringComparison.OrdinalIgnoreCase))
             {
                 return BadRequest("No such order found for this user.");
             }
+
+            var viewModel = new OrderViewModel
+            {
+                OrderDate = order.OrderDate,
+                OrderItems = order.OrderItems.Select(oi => new OrderItemViewModel
+                {
+                    PictureUrl = oi.ItemOrdered.PictureUri,
+                    ProductId = oi.ItemOrdered.CatalogItemId,
+                    ProductName = oi.ItemOrdered.ProductName,
+                    UnitPrice = oi.UnitPrice,
+                    Units = oi.Units
+                }).ToList(),
+                OrderNumber = order.Id,
+                ShippingAddress = order.ShipToAddress,
+                Total = order.Total()
+            };
 
             return View(viewModel);
         }

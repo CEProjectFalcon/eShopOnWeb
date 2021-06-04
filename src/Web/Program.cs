@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -44,8 +46,19 @@ namespace Microsoft.eShopWeb.Web
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                    webBuilder.ConfigureAppConfiguration(config =>
+                    {
+                        var settings = config.Build();
+                        config.AddAzureAppConfiguration(options =>
+                            options
+                                .Connect(Environment.GetEnvironmentVariable("APPCONFIG_CONNECTIONSTRING"))
+                                .ConfigureKeyVault(kv =>
+                                {
+                                    kv.SetCredential(new DefaultAzureCredential());
+                                })
+                                .Select(KeyFilter.Any, LabelFilter.Null)
+                                .Select(KeyFilter.Any, "Web")
+                        );
+                    }).UseStartup<Startup>());
     }
 }

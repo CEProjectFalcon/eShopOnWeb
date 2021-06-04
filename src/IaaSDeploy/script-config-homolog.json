@@ -1,0 +1,10 @@
+{
+    "fileUris": [
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/api.tar.gz",
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/web.tar.gz",
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/default",
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/eshoponweb.sh",
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/kestrel-api.service",
+        "https://stdeployhomolog.blob.core.windows.net/stcdeployhomolog/kestrel-web.service"
+    ]
+}
