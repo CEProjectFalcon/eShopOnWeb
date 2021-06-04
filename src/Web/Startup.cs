@@ -26,6 +26,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
+using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.eShopWeb.Web.Mentoring;
@@ -69,10 +71,6 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<CatalogContext>(c =>
                 c.UseInMemoryDatabase("Catalog"));
 
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
-
             ConfigureServices(services);
         }
 
@@ -84,15 +82,12 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<CatalogContext>(c =>
                 c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
 
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
-
             var dataProtectionConfig = new DataProtectionConfig();
             Configuration.Bind(DataProtectionConfig.CONFIG_NAME, dataProtectionConfig);
             services.AddDataProtection()
                 .PersistKeysToAzureBlobStorage(dataProtectionConfig.StorageAccountConnectionString, "dataprotection", "keystore")
                 .ProtectKeysWithAzureKeyVault(new Uri(dataProtectionConfig.KeyVaultUri), new DefaultAzureCredential());
+
 
             ConfigureServices(services);
         }
@@ -112,20 +107,8 @@ namespace Microsoft.eShopWeb.Web
 
             services.AddCookieSettings();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                    options.Cookie.SameSite = SameSiteMode.Lax;
-                });
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                       .AddDefaultUI()
-                       .AddEntityFrameworkStores<AppIdentityDbContext>()
-                                       .AddDefaultTokenProviders();
-
-            services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
+            services.AddAuthentication(AzureADB2CDefaults.AuthenticationScheme)
+                .AddAzureADB2C(options => Configuration.Bind("AzureAdB2C", options));
 
             services.AddCoreServices(Configuration);
             services.AddWebServices(Configuration);
