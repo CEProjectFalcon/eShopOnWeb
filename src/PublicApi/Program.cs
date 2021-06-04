@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Azure.Identity;
 
 namespace Microsoft.eShopWeb.PublicApi
 {
@@ -45,8 +47,19 @@ namespace Microsoft.eShopWeb.PublicApi
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                    webBuilder.ConfigureAppConfiguration(config =>
+                    {
+                        var settings = config.Build();
+                        config.AddAzureAppConfiguration(options =>
+                            options
+                                .Connect(Environment.GetEnvironmentVariable("APPCONFIG_CONNECTIONSTRING"))
+                                .ConfigureKeyVault(kv =>
+                                {
+                                    kv.SetCredential(new DefaultAzureCredential());
+                                })
+                                .Select(KeyFilter.Any, LabelFilter.Null)
+                                .Select(KeyFilter.Any, "PublicApi")
+                        );
+                    }).UseStartup<Startup>());
     }
 }

@@ -28,6 +28,11 @@ using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using BlazorShared;
 using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.eShopWeb.Web.Mentoring;
+using Microsoft.ApplicationInsights.DependencyCollector;
+using Azure.Identity;
 
 namespace Microsoft.eShopWeb.Web
 {
@@ -45,10 +50,10 @@ namespace Microsoft.eShopWeb.Web
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             // use in-memory database
-            ConfigureInMemoryDatabases(services);
+            //ConfigureInMemoryDatabases(services);
 
             // use real database
-            //ConfigureProductionServices(services);
+            ConfigureProductionServices(services);
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
@@ -77,6 +82,13 @@ namespace Microsoft.eShopWeb.Web
             services.AddDbContext<CatalogContext>(c =>
                 c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
 
+            var dataProtectionConfig = new DataProtectionConfig();
+            Configuration.Bind(DataProtectionConfig.CONFIG_NAME, dataProtectionConfig);
+            services.AddDataProtection()
+                .PersistKeysToAzureBlobStorage(dataProtectionConfig.StorageAccountConnectionString, "dataprotection", "keystore")
+                .ProtectKeysWithAzureKeyVault(new Uri(dataProtectionConfig.KeyVaultUri), new DefaultAzureCredential());
+
+
             ConfigureServices(services);
         }
 
@@ -89,6 +101,10 @@ namespace Microsoft.eShopWeb.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
+
             services.AddCookieSettings();
 
             services.AddAuthentication(AzureADB2CDefaults.AuthenticationScheme)
@@ -125,7 +141,6 @@ namespace Microsoft.eShopWeb.Web
                 config.Path = "/allservices";
             });
 
-            
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
             services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
@@ -133,6 +148,12 @@ namespace Microsoft.eShopWeb.Web
             services.AddScoped<HttpClient>(s => new HttpClient
             {
                 BaseAddress = new Uri(baseUrlConfig.WebBase)
+            });
+
+            // OrderApi service
+            services.AddHttpClient("order-api", options =>
+            {
+                options.BaseAddress = new Uri(baseUrlConfig.OrderBase);
             });
 
             // add blazor services
@@ -171,7 +192,7 @@ namespace Microsoft.eShopWeb.Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseShowAllServicesMiddleware();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
                 app.UseWebAssemblyDebugging();
             }
             else
@@ -186,6 +207,12 @@ namespace Microsoft.eShopWeb.Web
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();
 

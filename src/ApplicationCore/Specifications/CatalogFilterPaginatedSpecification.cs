@@ -10,8 +10,7 @@ namespace Microsoft.eShopWeb.ApplicationCore.Specifications
         {
             Query
                 .Where(i => (!brandId.HasValue || i.CatalogBrandId == brandId) &&
-                (!typeId.HasValue || i.CatalogTypeId == typeId))
-                .Paginate(skip, take);
+                (!typeId.HasValue || i.CatalogTypeId == typeId)).Skip(skip).Take(take);
         }
     }
 }
