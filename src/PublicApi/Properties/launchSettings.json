@@ -1,0 +1,32 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:52023",
+      "sslPort": 44339
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PublicApi - PROD": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "applicationUrl": "https://localhost:5099;http://localhost:5098"
+    }
+  }
+}

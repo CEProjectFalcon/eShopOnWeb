@@ -1,0 +1,136 @@
+name: eshoponweb-cd
+
+on:
+  #push:
+  #  branches: [ master]
+  #pull_request:
+  #  branches: [ master]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Install dependencies
+      run: dotnet restore
+    
+    - name: Build Public API
+      run: dotnet build src/PublicApi/PublicApi.csproj --configuration Release --no-restore
+    
+    - name: Build Order API
+      run: dotnet build src/OrderApi/OrderApi.csproj --configuration Release --no-restore
+
+    - name: Build Web
+      run: dotnet build src/Web/Web.csproj --configuration Release --no-restore
+    
+    - name: Test
+      run: dotnet test UnitTests/UnitTests.csproj --no-restore --verbosity normal
+    
+    - name: Publish Public API
+      run: dotnet publish src/PublicApi/PublicApi.csproj --configuration Release --output PublicApiPublish --no-restore
+    
+    - name: Publish Order API
+      run: dotnet publish src/OrderApi/OrderApi.csproj --configuration Release --output OrderApiPublish --no-restore
+
+    - name: Publish Web
+      run: dotnet publish src/Web/Web.csproj --configuration Release --output WebPublish --no-restore
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan -var="keyvault-serviceprincipal=${{ secrets.KEY_VAULT_SERVICE_PRINCIPAL_ID }}"
+
+    - name: Terraform Apply
+      run: terraform apply -var="keyvault-serviceprincipal=${{ secrets.KEY_VAULT_SERVICE_PRINCIPAL_ID }}" -auto-approve
+
+    - name: Azure Container Registry Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_SERVER }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and Push - PublicApi
+      run: |
+        docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }} -f ./src/PublicApi/Dockerfile .
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:latest
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }}
+
+    - name: Build and Push - OrderApi
+      run: |
+        docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }} -f ./src/OrderApi/Dockerfile .
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:latest
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }}
+    
+    - name: Build and Push - Web
+      run: |
+        docker build --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest --tag ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }} -f ./src/Web/Dockerfile .
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:latest
+        docker push ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
+
+    - name: Login AKS Cluster
+      uses: Azure/aks-set-context@v1
+      with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: aks-cluster
+          resource-group: rg-eshoponweb-cloud
+      id: login
+
+    - name: YAML Transform - APPCONFIG_CONNECTIONSTRING
+      uses: jwsi/secret-parser@v1
+      with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: APPCONFIG_CONNECTIONSTRING
+          secret-value: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
+
+    - name: YAML Transform - AZURE_CLIENT_ID
+      uses: jwsi/secret-parser@v1
+      with:
+          filename: src/PaaSDeploy/eshoponweb.yaml
+          secret-name: AZURE_CLIENT_ID
+          secret-value: ${{ secrets.AZURE_CLIENT_ID }}
+
+    - name: YAML Transform - AZURE_CLIENT_SECRET
+      uses: jwsi/secret-parser@v1
+      with:
+        filename: src/PaaSDeploy/eshoponweb.yaml
+        secret-name: AZURE_CLIENT_SECRET
+        secret-value: ${{ secrets.AZURE_CLIENT_SECRET }}
+    
+    - name: YAML Transform - AZURE_TENANT_ID
+      uses: jwsi/secret-parser@v1
+      with:
+        filename: src/PaaSDeploy/eshoponweb.yaml
+        secret-name: AZURE_TENANT_ID
+        secret-value: ${{ secrets.AZURE_TENANT_ID }}
+    
+    - name: Kubernetes Deploy
+      uses: Azure/k8s-deploy@v1
+      with:
+        namespace: "eshoponweb"
+        manifests: |
+          src/PaaSDeploy/eshoponweb.yaml
+        images: |
+          ${{ secrets.ACR_SERVER }}/eshoponweb-web:${{ github.sha }}
+          ${{ secrets.ACR_SERVER }}/eshoponweb-publicapi:${{ github.sha }}
+          ${{ secrets.ACR_SERVER }}/eshoponweb-orderapi:${{ github.sha }}

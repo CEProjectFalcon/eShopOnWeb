@@ -1,0 +1,33 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:17469",
+      "sslPort": 44315
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "/",
+      "environmentVariables": {
+        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
+    },
+    "Web - PROD": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "/",
+      "environmentVariables": {
+        "APPCONFIG_CONNECTIONSTRING": "Endpoint=https://appconfig-eshoponweb.azconfig.io;Id=qvdw-le-s0:yohMBXbAp1GSBbF9zFYI;Secret=36VW5GneivLdAXA66hwNl3lusJzBE9JBsHVYq0m0Chc=",
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
+    }
+  }
+}
